@@ -19,13 +19,14 @@ namespace Fyla.Web.Api
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/openapi/v1.json", "MapLarge Fyla API v1");
+                });
             }
 
             app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-
+            //app.UseAuthorization();
             app.MapControllers();
 
             app.Run();
