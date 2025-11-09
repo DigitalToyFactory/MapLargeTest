@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace TestProject.Controllers {
+namespace Fyla.Web.Controllers {
     [ApiController]
     [Route("[controller]")]
     public class TestController : ControllerBase {
