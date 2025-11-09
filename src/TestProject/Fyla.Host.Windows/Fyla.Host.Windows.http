@@ -1,0 +1,6 @@
+@Fyla.Host.Windows_HostAddress = http://localhost:5148
+
+GET {{Fyla.Host.Windows_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

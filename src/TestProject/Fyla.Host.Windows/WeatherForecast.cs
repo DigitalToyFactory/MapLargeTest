@@ -1,4 +1,4 @@
-namespace Fyla.Web.Api
+namespace Fyla.Host.Windows
 {
     public class WeatherForecast
     {

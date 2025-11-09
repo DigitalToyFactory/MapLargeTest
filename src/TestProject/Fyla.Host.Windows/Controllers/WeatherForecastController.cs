@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Fyla.Web.Api.Controllers
+namespace Fyla.Host.Windows.Controllers
 {
     [ApiController]
     [Route("[controller]")]

@@ -1,5 +1,5 @@
 
-namespace Fyla.Web.Api
+namespace Fyla.Host.Windows
 {
     public class Program
     {
