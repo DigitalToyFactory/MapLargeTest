@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<!-- Android only -->
@@ -23,6 +23,9 @@
 
 		<!-- Platform support -->
 		<SupportedOSPlatformVersion>21.0</SupportedOSPlatformVersion>
+
+		<!-- Android SDK path -->
+		<AndroidSdkTools>C:\Program Files (x86)\Android\android-sdk\platform-tools</AndroidSdkTools>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -44,9 +47,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="EmbedIO" Version="3.5.2" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.8" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="Watson" Version="6.4.0" />
 	</ItemGroup>
+
+	<Target Name="ReversePortAfterDeploy" AfterTargets="_Upload">
+		<Exec Command="&quot;$(AndroidSdkTools)\adb.exe&quot; forward tcp:28112 tcp:28111" ContinueOnError="true" />
+	</Target>
 
 </Project>
 

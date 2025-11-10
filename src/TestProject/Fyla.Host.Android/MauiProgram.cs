@@ -19,6 +19,9 @@ namespace Fyla.Host.Android
     		builder.Logging.AddDebug();
 #endif
 
+            //start web server
+            _ = Server.StartAsync();
+
             return builder.Build();
         }
     }
