@@ -2,5 +2,6 @@
 {
     public interface IDiskRepository
     {
+        IEnumerable<DiskItem> GetDirectoryContents(string path);
     }
 }

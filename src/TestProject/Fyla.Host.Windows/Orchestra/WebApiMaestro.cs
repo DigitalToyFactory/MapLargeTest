@@ -1,16 +1,42 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Firefly.Settings;
+using Fyla.FileSystem;
+using LightInject;
+using LightInject.Microsoft.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
+using Fyla.LightInject;
 
 namespace Fyla.Orchestra
 {
     public sealed class WebApiMaestro : MaestroBase
     {
+        public bool Initialized { get; private set; }
+
+        protected override void OnInitServices(IServiceRegistry registry)
+        {
+            if (Initialized)
+            {
+                return;
+            }
+
+            //registry.Register<ISettingsManager, SettingsManager>();
+            registry.Register<IDiskRepository, WindowsDiskRepository>();
+
+            Initialized = true;
+        }
+
         public override async Task RunAsync(string[] args)
         {
             Logger.Info("WebApi starting.");
 
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddSingleton<IMaestro>(this);
+            builder.Host.UseServiceProviderFactory(new LightInjectServiceProviderFactory());
+            builder.Host.ConfigureContainer<IServiceContainer>(container =>
+            {
+                this.ReplaceContainer((ServiceContainer)container);
+            });
+
+            //builder.Services.AddSingleton<IMaestro>(this);
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
 

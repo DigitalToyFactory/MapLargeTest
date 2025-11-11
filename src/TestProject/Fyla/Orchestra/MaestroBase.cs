@@ -8,7 +8,7 @@ namespace Fyla.Orchestra
     {
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
-        private readonly ServiceContainer _services;
+        private ServiceContainer _services;
         private readonly ManualResetEvent _ready;
         private readonly ManualResetEvent _terminateRequested;
         private readonly ManualResetEvent _terminateReady;
@@ -20,7 +20,17 @@ namespace Fyla.Orchestra
 
         public IServiceFactory Services => _services;
         public IServiceRegistry Registry => _services;
-        public IServiceContainer Container => _services;
+        public IServiceContainer Container
+        {
+            get => _services;
+            set
+            {
+                if(value is ServiceContainer container)
+                {
+                    _services = container;
+                }
+            }
+        }
 
         public ManualResetEvent ReadyEvent => _ready;
         public ManualResetEvent TerminateReadyEvent => _terminateReady;

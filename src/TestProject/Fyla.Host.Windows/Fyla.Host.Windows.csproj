@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
   </ItemGroup>
@@ -15,10 +16,6 @@
     <ProjectReference Include="..\Fyla.Api\Fyla.Api.csproj" />
     <ProjectReference Include="..\Fyla.Common\Fyla.Common.csproj" />
     <ProjectReference Include="..\Fyla\Fyla.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="FileSystem\" />
   </ItemGroup>
 
 </Project>
