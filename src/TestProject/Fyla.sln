@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fyla.Api", "Fyla.Api\Fyla.A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fyla.Host.Android", "Fyla.Host.Android\Fyla.Host.Android.csproj", "{B2272EC3-D396-4228-98F4-2048C0D069AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fyla.Settings", "Fyla.Settings\Fyla.Settings.csproj", "{14C88CAC-A5B5-4354-970D-75C3BA400D8A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,10 @@ Global
 		{B2272EC3-D396-4228-98F4-2048C0D069AB}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{B2272EC3-D396-4228-98F4-2048C0D069AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2272EC3-D396-4228-98F4-2048C0D069AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14C88CAC-A5B5-4354-970D-75C3BA400D8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14C88CAC-A5B5-4354-970D-75C3BA400D8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14C88CAC-A5B5-4354-970D-75C3BA400D8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14C88CAC-A5B5-4354-970D-75C3BA400D8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -63,6 +69,7 @@ Global
 		{4A53D588-2CEC-4AE3-A0A1-E9B930464B99} = {B27155EE-D7B2-4416-AB1E-AC5C68A7624B}
 		{80F86946-36E1-43D6-8E67-B4506F12EBE1} = {ECF908C8-25C7-4DB0-8B7F-2DE95B43FEE5}
 		{B2272EC3-D396-4228-98F4-2048C0D069AB} = {F2802320-43F2-4322-88AA-421679567F96}
+		{14C88CAC-A5B5-4354-970D-75C3BA400D8A} = {ECF908C8-25C7-4DB0-8B7F-2DE95B43FEE5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8F48BCB7-F418-4A32-9C88-6124323FDA8D}

@@ -11,4 +11,14 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Fyla.Api\Fyla.Api.csproj" />
+    <ProjectReference Include="..\Fyla.Common\Fyla.Common.csproj" />
+    <ProjectReference Include="..\Fyla\Fyla.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="FileSystem\" />
+  </ItemGroup>
+
 </Project>

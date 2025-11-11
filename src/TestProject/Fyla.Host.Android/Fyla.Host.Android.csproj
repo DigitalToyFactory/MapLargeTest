@@ -51,7 +51,16 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.8" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-		<PackageReference Include="Watson" Version="6.4.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Fyla.Api\Fyla.Api.csproj" />
+	  <ProjectReference Include="..\Fyla.Common\Fyla.Common.csproj" />
+	  <ProjectReference Include="..\Fyla\Fyla.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="FileSystem\" />
 	</ItemGroup>
 
 	<Target Name="ReversePortAfterDeploy" AfterTargets="_Upload">
