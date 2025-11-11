@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using LightInject;
+using NLog;
 
 namespace Fyla.Orchestra
 {
@@ -14,6 +15,8 @@ namespace Fyla.Orchestra
         ManualResetEvent TerminateReadyEvent { get; }
         ManualResetEvent TerminatedEvent { get; }
         CancellationTokenSource CancelOnTerminate { get; }
+
+        ILogger Logger { get; }
 
         Task RunAsync(string[] args);
         Task LoopAsync();

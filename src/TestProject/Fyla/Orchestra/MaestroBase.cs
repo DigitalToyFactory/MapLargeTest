@@ -29,7 +29,7 @@ namespace Fyla.Orchestra
 
         protected virtual int LoopDelayMs { get; } = 250;
 
-        protected ILogger Logger => _logger;
+        public ILogger Logger => _logger;
 
         public void Initialize(string[] args)
         {

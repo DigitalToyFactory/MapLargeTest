@@ -10,6 +10,7 @@ namespace Fyla.Orchestra
 
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddSingleton<IMaestro>(this);
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
 

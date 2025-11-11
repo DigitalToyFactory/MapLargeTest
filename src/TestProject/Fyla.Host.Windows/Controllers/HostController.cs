@@ -1,3 +1,4 @@
+using Fyla.Orchestra;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fyla.Host.Windows.Controllers
@@ -6,28 +7,26 @@ namespace Fyla.Host.Windows.Controllers
     [Route("[controller]")]
     public class HostController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+        private readonly IMaestro _maestro;
 
-        private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        [HttpGet("Terminate")]
+        public IActionResult Terminate()
         {
-            _logger = logger;
+            _maestro.Logger.Info("Termination requested via HostController.");
+
+            _maestro.Terminate();
+
+            return Ok(new
+            {
+                Message = "Termination signal sent.",
+                Timestamp = DateTime.UtcNow
+            });
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public HostController(IMaestro maestro)
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            _maestro = maestro;
         }
     }
 }
+

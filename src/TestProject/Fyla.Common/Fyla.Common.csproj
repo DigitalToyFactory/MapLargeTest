@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="FileSystem\" />
+    <Folder Include="Helpers\" />
+  </ItemGroup>
+
 </Project>
