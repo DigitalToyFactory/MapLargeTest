@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="FileSystem\" />
-    <Folder Include="Helpers\" />
   </ItemGroup>
 
 </Project>

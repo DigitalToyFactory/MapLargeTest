@@ -1,4 +1,4 @@
-﻿namespace Firefly.Settings
+﻿namespace Fyla.Settings
 {
     public interface ISettingsManager
     {

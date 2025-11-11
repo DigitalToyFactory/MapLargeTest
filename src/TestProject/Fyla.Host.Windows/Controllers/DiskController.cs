@@ -38,6 +38,33 @@ namespace Fyla.Host.Windows.Controllers
             }
         }
 
+        [HttpGet("Search")]
+        public IActionResult ListDirectory([FromQuery] string path = "", [FromQuery] string pattern = "*.*")
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    path = Directory.GetCurrentDirectory();
+                }
+
+                _maestro.Logger.Info($"Searching directory: {path}");
+
+                var result = _diskRepository.Search(path, pattern, true);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _maestro.Logger.Error(ex, $"Failed to search directory: {path}");
+                return BadRequest(new
+                {
+                    Error = ex.Message,
+                    Path = path
+                });
+            }
+        }
+
         public DiskController(IMaestro maestro, IDiskRepository diskRepository)
         {
             _maestro = maestro;

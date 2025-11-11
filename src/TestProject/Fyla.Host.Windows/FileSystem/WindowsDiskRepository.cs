@@ -1,4 +1,5 @@
-﻿using Fyla.Orchestra;
+﻿using Fyla.Helpers;
+using Fyla.Orchestra;
 
 namespace Fyla.FileSystem
 {
@@ -27,6 +28,15 @@ namespace Fyla.FileSystem
             });
 
             return dirs.Concat(files);
+        }
+
+        public IEnumerable<DiskItem> Search(string path, string pattern, bool deep)
+        {
+            var root = new DirectoryInfo(path);
+            foreach(var fileObject in root.WalkTree(pattern, deep))
+            {
+                yield return DiskItem.From(fileObject);
+            }
         }
     
         public WindowsDiskRepository(IMaestro maestro)
