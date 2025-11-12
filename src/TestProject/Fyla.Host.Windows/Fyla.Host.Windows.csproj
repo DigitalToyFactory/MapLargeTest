@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Fyla.Api\Fyla.Api.csproj" />
     <ProjectReference Include="..\Fyla.Common\Fyla.Common.csproj" />
+    <ProjectReference Include="..\Fyla.Settings\Fyla.Settings.csproj" />
     <ProjectReference Include="..\Fyla\Fyla.csproj" />
   </ItemGroup>
 

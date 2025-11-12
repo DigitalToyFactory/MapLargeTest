@@ -18,8 +18,11 @@ namespace Fyla.Orchestra
                 return;
             }
 
-            //registry.Register<ISettingsManager, SettingsManager>();
+            registry.Register<ISettingsManager, SettingsManager>();
             registry.Register<IDiskRepository, WindowsDiskRepository>();
+
+            var settingsManager = this.Service<ISettingsManager>();
+            settingsManager.Initialize();
 
             Initialized = true;
         }

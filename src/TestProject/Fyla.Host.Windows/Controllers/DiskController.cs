@@ -2,8 +2,11 @@
 using Fyla.Helpers;
 using Fyla.Orchestra;
 using Fyla.Services;
+using Fyla.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using System.IO;
+using System.Runtime.InteropServices.JavaScript;
 
 namespace Fyla.Host.Windows.Controllers
 {
@@ -13,6 +16,32 @@ namespace Fyla.Host.Windows.Controllers
     {
         private readonly IMaestro _maestro;
         private readonly IDiskRepository _diskRepository;
+        private readonly ISettingsManager _settings;
+
+        private List<string> _allowedRoots = new List<string>();
+
+        public List<string> AllowedRoots
+        {
+            get => _allowedRoots;
+            set => _allowedRoots = value;
+        }
+        
+        public bool IsAuthorized(string path)
+        {
+            var fullPath = Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+
+            foreach (var root in _allowedRoots)
+            {
+                var fullRoot = Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+                if (fullPath.StartsWith(fullRoot, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
 
         [HttpGet("List")]
         public IActionResult ListDirectory([FromQuery] string path = "")
@@ -22,6 +51,11 @@ namespace Fyla.Host.Windows.Controllers
                 if (string.IsNullOrWhiteSpace(path))
                 {
                     path = Directory.GetCurrentDirectory();
+                }
+
+                if (!IsAuthorized(path))
+                {
+                    return Forbid();
                 }
 
                 _maestro.Logger.Info($"Listing directory: {path}");
@@ -49,6 +83,11 @@ namespace Fyla.Host.Windows.Controllers
                 if (string.IsNullOrWhiteSpace(path))
                 {
                     path = Directory.GetCurrentDirectory();
+                }
+
+                if (!IsAuthorized(path))
+                {
+                    return Forbid();
                 }
 
                 _maestro.Logger.Info($"Searching directory: {path}");
@@ -79,6 +118,11 @@ namespace Fyla.Host.Windows.Controllers
                 return NotFound();
             }
 
+            if (!IsAuthorized(fileInfo.FullName))
+            {
+                return Forbid();
+            }
+
             var provider = new FileExtensionContentTypeProvider();
             if (!provider.TryGetContentType(fileInfo.FullName, out var contentType))
             {
@@ -104,6 +148,11 @@ namespace Fyla.Host.Windows.Controllers
             if (string.IsNullOrWhiteSpace(path))
             {
                 return BadRequest("No path provided.");
+            }
+
+            if (!IsAuthorized(path))
+            {
+                return Forbid();
             }
 
             var fileInfo = new FileInfo(path);
@@ -139,6 +188,11 @@ namespace Fyla.Host.Windows.Controllers
                 return BadRequest("No path provided.");
             }
 
+            if (!IsAuthorized(path))
+            {
+                return Forbid();
+            }
+
             try
             {
                 _diskRepository.Delete(path);
@@ -159,6 +213,11 @@ namespace Fyla.Host.Windows.Controllers
                 return BadRequest("Source or destination missing.");
             }
 
+            if (!IsAuthorized(src) || !IsAuthorized(dest))
+            {
+                return Forbid();
+            }
+
             try
             {
                 _diskRepository.Copy(src, dest);
@@ -177,6 +236,11 @@ namespace Fyla.Host.Windows.Controllers
             if (string.IsNullOrWhiteSpace(src) || string.IsNullOrWhiteSpace(dest))
             {
                 return BadRequest("Source or destination missing.");
+            }
+
+            if (!IsAuthorized(src) || !IsAuthorized(dest))
+            {
+                return Forbid();
             }
 
             try
@@ -211,11 +275,21 @@ namespace Fyla.Host.Windows.Controllers
             }
         }
 
+        private void RegisterSettings()
+        {
+            var defaultAllowedRoots =  new List<string>() { "C:\\", "X:\\", "Y:\\" };
+            var test = defaultAllowedRoots.Serialize();
 
-        public DiskController(IMaestro maestro, IDiskRepository diskRepository)
+            AllowedRoots = _settings.GetSetDefaultValue("DiskController.AllowedRoots", defaultAllowedRoots.Serialize()).Deserialize<List<string>>();
+        }
+
+        public DiskController(IMaestro maestro, IDiskRepository diskRepository, ISettingsManager settings)
         {
             _maestro = maestro;
             _diskRepository = diskRepository;
+            _settings = settings;
+
+            RegisterSettings();
         }
     }
 }
