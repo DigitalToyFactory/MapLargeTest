@@ -85,13 +85,16 @@ function render(path: string, items: DiskItem[], mode: "list" | "search"): void 
     }).join("");
 
     els.list.innerHTML = `
-      <h3>${mode === "list" ? "Browsing" : "Search"}: ${path}</h3>
+      <div class="list-header">
+        <h3>${mode === "list" ? "Browsing" : "Search"}: ${path}</h3>
+        <div class="stats">${dirs} folders | ${files} files | ${fmtBytes(size)} total</div>
+      </div>
       <table>
         <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Modified</th></tr></thead>
         <tbody>${rows}</tbody>
-        <tfoot><tr><td colspan="4">${dirs} folders • ${files} files • ${fmtBytes(size)} total</td></tr></tfoot>
       </table>
     `;
+
 
     els.list.querySelectorAll<HTMLElement>("[data-nav]").forEach(el => {
         el.onclick = () => setCurrentPath(el.dataset.nav!);
@@ -177,12 +180,24 @@ function attachEvents(): void {
     });
 }
 
-
 async function loadConfig(): Promise<ClientConfig> {
   const r = await fetch("/fyla.config.json", { cache: "no-store" });
   if (!r.ok) { throw new Error("Failed to load fyla.config.json"); }
   return r.json();
 }
+
+const modal = document.getElementById("fileBrowserModal") as HTMLDivElement;
+const openBtn = document.getElementById("openBrowserBtn") as HTMLButtonElement;
+const closeBtn = document.getElementById("closeBrowserBtn") as HTMLButtonElement;
+
+openBtn.onclick = () => modal.classList.remove("hidden");
+closeBtn.onclick = () => modal.classList.add("hidden");
+
+modal.onclick = (ev) => {
+  if (ev.target === modal) {
+    modal.classList.add("hidden");
+  }
+};
 
 (async function boot() {
     const cfg = await loadConfig();
