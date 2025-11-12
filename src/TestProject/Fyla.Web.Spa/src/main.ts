@@ -52,6 +52,12 @@ function getDirectoryPart(p: string): string {
     return p.slice(0, idx + 1);
 }
 
+function showSpinner(show: boolean): void {
+    const el = document.getElementById("spinner");
+    if (!el) return;
+    el.classList.toggle("hidden", !show);
+}
+
 function render(path: string, items: DiskItem[], mode: "list" | "search"): void {
     els.pathInput.value = path;
 
@@ -137,9 +143,9 @@ function attachEvents(): void {
         const pattern = els.searchInput.value.trim();
         const deep = (document.getElementById("deepCheck") as HTMLInputElement)?.checked ?? false;
 
+        showSpinner(true);
         try {
             if (!pattern) {
-                // regular directory list, not deep
                 await refresh();
             } else {
                 const items = await search(path, pattern, deep);
@@ -147,8 +153,11 @@ function attachEvents(): void {
             }
         } catch (e: any) {
             els.list.innerHTML = `<pre>${e?.message ?? e}</pre>`;
+        } finally {
+            showSpinner(false);
         }
     };
+
 
     els.uploadBtn.onclick = async () => {
         const input = document.createElement("input");
