@@ -1,6 +1,8 @@
 ﻿using Fyla.FileSystem;
 using Fyla.Orchestra;
+using Fyla.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace Fyla.Host.Windows.Controllers
 {
@@ -63,6 +65,26 @@ namespace Fyla.Host.Windows.Controllers
                     Path = path
                 });
             }
+        }
+
+        [HttpGet]
+        [Route("Download")]
+        public IActionResult DownloadFile([FromQuery] FileDownloadRequest request)
+        {
+            var fileInfo = new FileInfo(request.Path);
+
+            if (!fileInfo.Exists)
+            {
+                return NotFound();
+            }
+
+            var provider = new FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(fileInfo.FullName, out var contentType))
+            {
+                contentType = "application/octet-stream"; // fallback for unknown types
+            }
+
+            return File(fileInfo.OpenRead(), contentType, fileInfo.Name);
         }
 
         public DiskController(IMaestro maestro, IDiskRepository diskRepository)
