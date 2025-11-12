@@ -42,7 +42,7 @@ namespace Fyla.Host.Windows.Controllers
         }
 
         [HttpGet("Search")]
-        public IActionResult SearchDirectory([FromQuery] string path = "", [FromQuery] string pattern = "*.*")
+        public IActionResult SearchDirectory([FromQuery] string path = "", [FromQuery] string pattern = "*.*", [FromQuery] bool deep = false)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace Fyla.Host.Windows.Controllers
 
                 _maestro.Logger.Info($"Searching directory: {path}");
 
-                var result = _diskRepository.Search(path, pattern, true);
+                var result = _diskRepository.Search(path, pattern, deep);
 
                 return Ok(result);
             }

@@ -44,25 +44,30 @@ function counts(items: DiskItem[]): { files: number; dirs: number; size: number 
     return { files, dirs, size };
 }
 
+function getDirectoryPart(p: string): string {
+    if (!p) return "";
+    const sep = p.includes("\\") ? "\\" : "/";
+    const idx = p.lastIndexOf(sep);
+    if (idx <= 0) return p;
+    return p.slice(0, idx + 1);
+}
+
 function render(path: string, items: DiskItem[], mode: "list" | "search"): void {
     els.pathInput.value = path;
 
-    for (const it of items) {
-        (it as any).fullPath = (it as any).fullPath ?? joinPath(path, it.name);
-    }
-
     const { files, dirs, size } = counts(items);
 
-    const rows = items.map(i => {
+    const rows = items.map(i => 
+    {
         const isDir = i.type === "Directory";
-        const full = (i as any).fullPath ?? joinPath(path, i.name);
+        const full = (i as any).path || joinPath(path, i.name);
 
         const nameCell = isDir
             ? `<span class="click" data-nav="${full}">${i.name}</span>`
             : `<span class="click" data-dl="${full}">${i.name}</span>`;
 
         const subPath = mode === "search"
-            ? `<div class="subpath">${full}</div>`
+            ? `<div class="subpath">${getDirectoryPart(full)}</div>`
             : "";
 
         return `<tr>
@@ -102,11 +107,16 @@ async function refresh(): Promise<void> {
 
 async function doSearch(): Promise<void> {
     const path = getCurrentPath();
-    const q = els.searchInput.value.trim();
-    if (!q) { await refresh(); return; }
+    const pattern = els.searchInput.value.trim();
+    const deep = (document.getElementById("deepCheck") as HTMLInputElement)?.checked ?? false;
+
     try {
-        const items = await search(path, q);
-        render(path, items, "search");
+        if (!pattern) {
+            await refresh();
+        } else {
+            const items = await search(path, pattern, deep);
+            render(path, items, "search");
+        }
     } catch (e: any) {
         els.list.innerHTML = `<pre>${e?.message ?? e}</pre>`;
     }
@@ -114,11 +124,32 @@ async function doSearch(): Promise<void> {
 
 function attachEvents(): void {
     els.upBtn.onclick = () => setCurrentPath(parentPath(getCurrentPath()));
-    els.refreshBtn.onclick = () => refresh();
-    els.searchBtn.onclick = () => doSearch();
+
     els.pathInput.onkeydown = (ev) => {
-        if (ev.key === "Enter") setCurrentPath(els.pathInput.value.trim());
+        if (ev.key === "Enter") {
+            setCurrentPath(els.pathInput.value.trim());
+        }
     };
+
+    //unified search / refresh button
+    els.searchBtn.onclick = async () => {
+        const path = getCurrentPath();
+        const pattern = els.searchInput.value.trim();
+        const deep = (document.getElementById("deepCheck") as HTMLInputElement)?.checked ?? false;
+
+        try {
+            if (!pattern) {
+                // regular directory list, not deep
+                await refresh();
+            } else {
+                const items = await search(path, pattern, deep);
+                render(path, items, "search");
+            }
+        } catch (e: any) {
+            els.list.innerHTML = `<pre>${e?.message ?? e}</pre>`;
+        }
+    };
+
     els.uploadBtn.onclick = async () => {
         const input = document.createElement("input");
         input.type = "file";
@@ -132,8 +163,11 @@ function attachEvents(): void {
         input.click();
     };
 
-    onRouteChange(() => { refresh(); });
+    onRouteChange(() => {
+        refresh();
+    });
 }
+
 
 async function loadConfig(): Promise<ClientConfig> {
   const r = await fetch("/fyla.config.json", { cache: "no-store" });

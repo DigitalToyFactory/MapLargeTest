@@ -15,8 +15,10 @@ export async function list(path: string): Promise<DiskItem[]> {
     return res.json();
 }
 
-export async function search(path: string, query: string): Promise<DiskItem[]> {
-    const res = await fetch(`${apiBaseUrl}${base}/Search?path=${encodeURIComponent(path)}&pattern=${encodeURIComponent(query)}`);
+export async function search(path: string, pattern: string, deep: boolean): Promise<DiskItem[]> {
+    const res = await fetch(
+        `${apiBaseUrl}${base}/Search?path=${encodeURIComponent(path)}&pattern=${encodeURIComponent(pattern)}&deep=${deep}`
+    );
     if (!res.ok) {
         throw new Error(`Search failed: ${res.status}`);
     }
