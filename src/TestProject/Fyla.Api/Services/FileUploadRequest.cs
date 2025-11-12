@@ -1,8 +1,10 @@
-﻿namespace Fyla.Services
+﻿using Microsoft.AspNetCore.Http;
+
+namespace Fyla.Services
 {
     public class FileUploadRequest
     {
-        public string Path { get; set; }
-        public byte[] Bytes { get; set; }
+        public IFormFile? File { get; set; }
+        public string? Path { get; set; }
     }
 }

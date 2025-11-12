@@ -38,7 +38,18 @@ namespace Fyla.Orchestra
 
             //builder.Services.AddSingleton<IMaestro>(this);
             builder.Services.AddControllers();
-            builder.Services.AddOpenApi();
+            
+            //NOTE: OpenApi not playing nice with Swagger, file browse not showing in API UI
+            //builder.Services.AddOpenApi();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "MapLarge Fyla API",
+                    Version = "v1"
+                });
+            });
 
             var app = builder.Build();
 
@@ -46,10 +57,12 @@ namespace Fyla.Orchestra
 
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                //app.MapOpenApi();
+                app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/openapi/v1.json", "MapLarge Fyla API v1");
+                    //c.SwaggerEndpoint("/openapi/v1.json", "MapLarge Fyla API v1");
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MapLarge Fyla API v1");
                 });
             }
 

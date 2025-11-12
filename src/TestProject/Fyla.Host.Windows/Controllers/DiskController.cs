@@ -1,4 +1,5 @@
 ﻿using Fyla.FileSystem;
+using Fyla.Helpers;
 using Fyla.Orchestra;
 using Fyla.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -86,6 +87,49 @@ namespace Fyla.Host.Windows.Controllers
 
             return File(fileInfo.OpenRead(), contentType, fileInfo.Name);
         }
+
+        [HttpPost]
+        [Route("Upload")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadFile([FromForm] FileUploadRequest request)
+        {
+            var file = request.File;
+            var path = request.Path;
+
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return BadRequest("No path provided.");
+            }
+
+            var fileInfo = new FileInfo(path);
+            var directory = fileInfo.Directory;
+
+            if (directory == null || !directory.Exists)
+            {
+                return NotFound("Target directory not found.");
+            }
+
+            if (fileInfo.Exists)
+            {
+                return Conflict("File already exists.");
+            }
+
+            await using (var stream = new FileStream(fileInfo.FullName, FileMode.CreateNew))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return Ok(new FileUploadResult
+            {
+                Checksum = fileInfo.CalculateFileMD5()
+            });
+        }
+
 
         public DiskController(IMaestro maestro, IDiskRepository diskRepository)
         {
