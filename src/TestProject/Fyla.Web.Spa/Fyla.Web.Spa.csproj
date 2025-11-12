@@ -7,7 +7,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="src\api.ts" />
+    <None Remove="src\main.ts" />
+    <None Remove="src\router.ts" />
+    <None Remove="src\types.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="wwwroot\index.html" />
   </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="src\api.ts" />
+    <TypeScriptCompile Include="src\main.ts" />
+    <TypeScriptCompile Include="src\router.ts" />
+    <TypeScriptCompile Include="src\types.ts" />
+  </ItemGroup>
+
+  <Target Name="RunTypeScriptBuild" BeforeTargets="Build">
+	<Exec Command="npx tsc" WorkingDirectory="$(ProjectDir)" />
+  </Target>
 
 </Project>

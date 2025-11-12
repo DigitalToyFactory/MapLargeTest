@@ -51,6 +51,11 @@ namespace Fyla.Orchestra
                 });
             });
 
+            builder.Services.AddCors(o =>
+            {
+                o.AddPolicy("any", p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+            });
+
             var app = builder.Build();
 
             app.Lifetime.ApplicationStarted.Register(Ready);
@@ -66,6 +71,7 @@ namespace Fyla.Orchestra
                 });
             }
 
+            app.UseCors("any");
             app.UseHttpsRedirection();
             app.MapControllers();
 
