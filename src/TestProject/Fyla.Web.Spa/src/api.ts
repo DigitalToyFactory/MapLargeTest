@@ -16,7 +16,7 @@ export async function list(path: string): Promise<DiskItem[]> {
 }
 
 export async function search(path: string, query: string): Promise<DiskItem[]> {
-    const res = await fetch(`${apiBaseUrl}${base}/Search?path=${encodeURIComponent(path)}&q=${encodeURIComponent(query)}`);
+    const res = await fetch(`${apiBaseUrl}${base}/Search?path=${encodeURIComponent(path)}&pattern=${encodeURIComponent(query)}`);
     if (!res.ok) {
         throw new Error(`Search failed: ${res.status}`);
     }

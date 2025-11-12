@@ -42,7 +42,7 @@ namespace Fyla.Host.Windows.Controllers
         }
 
         [HttpGet("Search")]
-        public IActionResult ListDirectory([FromQuery] string path = "", [FromQuery] string pattern = "*.*")
+        public IActionResult SearchDirectory([FromQuery] string path = "", [FromQuery] string pattern = "*.*")
         {
             try
             {

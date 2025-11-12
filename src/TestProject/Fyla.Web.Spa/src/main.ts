@@ -47,35 +47,41 @@ function counts(items: DiskItem[]): { files: number; dirs: number; size: number 
 function render(path: string, items: DiskItem[], mode: "list" | "search"): void {
     els.pathInput.value = path;
 
-    // Ensure fullPath exists client-side if API doesn’t send it yet
     for (const it of items) {
         (it as any).fullPath = (it as any).fullPath ?? joinPath(path, it.name);
     }
 
     const { files, dirs, size } = counts(items);
+
     const rows = items.map(i => {
         const isDir = i.type === "Directory";
+        const full = (i as any).fullPath ?? joinPath(path, i.name);
+
         const nameCell = isDir
-            ? `<span class="click" data-nav="${(i as any).fullPath}">${i.name}</span>`
-            : `<span class="click" data-dl="${(i as any).fullPath}">${i.name}</span>`;
+            ? `<span class="click" data-nav="${full}">${i.name}</span>`
+            : `<span class="click" data-dl="${full}">${i.name}</span>`;
+
+        const subPath = mode === "search"
+            ? `<div class="subpath">${full}</div>`
+            : "";
+
         return `<tr>
-      <td>${nameCell}</td>
-      <td>${i.type}</td>
-      <td>${isDir ? "" : fmtBytes(i.size)}</td>
-      <td>${i.lastModified ?? ""}</td>
-    </tr>`;
+          <td>${nameCell}${subPath}</td>
+          <td>${i.type}</td>
+          <td>${isDir ? "" : fmtBytes(i.size)}</td>
+          <td>${i.lastModified ?? ""}</td>
+        </tr>`;
     }).join("");
 
     els.list.innerHTML = `
-    <h3>${mode === "list" ? "Browsing" : "Search"}: ${path}</h3>
-    <table>
-      <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Modified</th></tr></thead>
-      <tbody>${rows}</tbody>
-      <tfoot><tr><td colspan="4">${dirs} folders • ${files} files • ${fmtBytes(size)} total</td></tr></tfoot>
-    </table>
-  `;
+      <h3>${mode === "list" ? "Browsing" : "Search"}: ${path}</h3>
+      <table>
+        <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Modified</th></tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr><td colspan="4">${dirs} folders • ${files} files • ${fmtBytes(size)} total</td></tr></tfoot>
+      </table>
+    `;
 
-    // Delegate clicks
     els.list.querySelectorAll<HTMLElement>("[data-nav]").forEach(el => {
         el.onclick = () => setCurrentPath(el.dataset.nav!);
     });
