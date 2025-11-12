@@ -258,8 +258,10 @@ namespace Fyla.Host.Windows.Controllers
         {
             var dir = new DirectoryInfo(sourceDir);
             if (!dir.Exists)
+            {
                 throw new DirectoryNotFoundException($"Source directory not found: {sourceDir}");
-
+            }
+            
             Directory.CreateDirectory(destDir);
 
             foreach (var file in dir.GetFiles())
@@ -278,8 +280,6 @@ namespace Fyla.Host.Windows.Controllers
         private void RegisterSettings()
         {
             var defaultAllowedRoots =  new List<string>() { "C:\\", "X:\\", "Y:\\" };
-            var test = defaultAllowedRoots.Serialize();
-
             AllowedRoots = _settings.GetSetDefaultValue("DiskController.AllowedRoots", defaultAllowedRoots.Serialize()).Deserialize<List<string>>();
         }
 
