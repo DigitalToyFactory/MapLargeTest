@@ -1,4 +1,4 @@
-import { initApi, list, search, download, upload } from "./api.js";
+﻿import { initApi, list, search, download, upload, del, copy, move, getApiBaseUrl } from "./api.js";
 import type { DiskItem } from "./types.js";
 import { getCurrentPath, setCurrentPath, onRouteChange } from "./router.js";
 
@@ -180,6 +180,142 @@ function attachEvents(): void {
     });
 }
 
+function setupContextMenu(): void {
+  const menu = document.getElementById("ctxMenu") as HTMLUListElement;
+  const modal = document.getElementById("actionModal")!;
+  const title = document.getElementById("actionTitle")!;
+  const srcLabel = document.getElementById("actionSource")!;
+  const destInput = document.getElementById("actionDest") as HTMLInputElement;
+  const okBtn = document.getElementById("actionOk")!;
+  const cancelBtn = document.getElementById("actionCancel")!;
+
+  let currentPath = "";
+  let currentAction: "copy" | "move" | "delete" | null = null;
+
+  window.addEventListener("click", (ev) => {
+    if (!(ev.target as HTMLElement).closest("#ctxMenu")) {
+        menu.classList.add("hidden");
+        els.list.querySelectorAll("tr.highlight").forEach(t => t.classList.remove("highlight"));
+      }
+   });
+
+
+  els.list.addEventListener("contextmenu", (ev) => 
+  {
+    const tr = (ev.target as HTMLElement).closest("tr");
+    if (!tr) return;
+    ev.preventDefault();
+
+    els.list.querySelectorAll("tr.highlight").forEach(t => t.classList.remove("highlight"));
+    tr.classList.add("highlight");
+
+    const span = tr.querySelector("[data-nav], [data-dl]") as HTMLElement;
+    if (!span) return;
+
+    currentPath = span.dataset.nav || span.dataset.dl || "";
+    if (!currentPath) return;
+
+    menu.style.left = ev.pageX + "px";
+    menu.style.top = ev.pageY + "px";
+    menu.classList.remove("hidden");
+  });
+
+  menu.addEventListener("click", async (ev) => {
+    const target = ev.target as HTMLElement;
+    const action = target.dataset.action || target.closest("[data-action]")?.getAttribute("data-action");
+    if (!action || !currentPath) return;
+
+    menu.classList.add("hidden");
+
+    if (action === "delete") {
+        const ok = confirm(`Are you sure you want to delete:\n${currentPath}?`);
+        if (!ok) return;
+
+        try {
+            await del(currentPath);
+            await refresh();
+        } catch (err: any) {
+            alert(`Delete failed: ${err.message || err}`);
+        }
+        return; // ✅ stop here
+    }
+
+    if (action === "copy" || action === "move") {
+        openActionModal(action as "copy" | "move", currentPath);
+        return;
+    }
+  });
+
+  window.addEventListener("click", (ev) => {
+    if (!(ev.target as HTMLElement).closest("#ctxMenu")) {
+        menu.classList.add("hidden");
+    }
+  });
+
+  okBtn.addEventListener("click", async () => {
+    const dest = destInput.value.trim();
+    if (!dest) return alert("Enter a destination path.");
+
+    const endpoint = currentAction === "copy" ? "Copy" : "Move";
+    const res = await fetch(
+      `${getApiBaseUrl()}/Disk/${endpoint}?src=${encodeURIComponent(currentPath)}&dest=${encodeURIComponent(dest)}`,
+      { method: "POST" }
+    );
+    modal.classList.add("hidden");
+    if (res.ok) await refresh();
+    else alert(`${endpoint} failed.`);
+  });
+
+  cancelBtn.addEventListener("click", () => modal.classList.add("hidden"));
+}
+
+function openActionModal(actionType: "copy" | "move", srcPath: string): void {
+    const modal = document.getElementById("actionModal") as HTMLDivElement;
+    const title = document.getElementById("actionTitle")!;
+    const source = document.getElementById("actionSource")!;
+    const destInput = document.getElementById("actionDest") as HTMLInputElement;
+    const okBtn = document.getElementById("actionOk") as HTMLButtonElement;
+    const cancelBtn = document.getElementById("actionCancel") as HTMLButtonElement;
+
+    title.textContent = `${actionType === "copy" ? "Copy" : "Move"} File or Folder`;
+    source.textContent = `From: ${srcPath}`;
+    destInput.value = "";
+    modal.classList.remove("hidden");
+
+    // Remove any previously attached handlers
+    okBtn.replaceWith(okBtn.cloneNode(true));
+    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+
+    const newOkBtn = document.getElementById("actionOk") as HTMLButtonElement;
+    const newCancelBtn = document.getElementById("actionCancel") as HTMLButtonElement;
+
+    const closeModal = () => {
+        modal.classList.add("hidden");
+    };
+
+    newCancelBtn.onclick = closeModal;
+
+    newOkBtn.onclick = async () => {
+        const dest = destInput.value.trim();
+        if (!dest) {
+            alert("Please enter a destination path.");
+            return;
+        }
+
+        try {
+            if (actionType === "copy") {
+                await copy(srcPath, dest);
+            } else {
+                await move(srcPath, dest);
+            }
+            closeModal();
+            await refresh();
+        } catch (err: any) {
+            alert(`Operation failed: ${err.message || err}`);
+        }
+    };
+}
+
 async function loadConfig(): Promise<ClientConfig> {
   const r = await fetch("/fyla.config.json", { cache: "no-store" });
   if (!r.ok) { throw new Error("Failed to load fyla.config.json"); }
@@ -208,6 +344,7 @@ modal.onclick = (ev) => {
     }
 
     attachEvents();
+    setupContextMenu();
     refresh();
     onRouteChange(() => { refresh(); });
 })();

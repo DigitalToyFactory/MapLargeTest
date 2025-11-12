@@ -130,6 +130,87 @@ namespace Fyla.Host.Windows.Controllers
             });
         }
 
+        [HttpDelete]
+        [Route("Delete")]
+        public IActionResult DeleteItem([FromQuery] string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return BadRequest("No path provided.");
+            }
+
+            try
+            {
+                _diskRepository.Delete(path);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("Copy")]
+        public IActionResult CopyItem([FromQuery] string src, [FromQuery] string dest)
+        {
+            if (string.IsNullOrWhiteSpace(src) || string.IsNullOrWhiteSpace(dest))
+            {
+                return BadRequest("Source or destination missing.");
+            }
+
+            try
+            {
+                _diskRepository.Copy(src, dest);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("Move")]
+        public IActionResult MoveItem([FromQuery] string src, [FromQuery] string dest)
+        {
+            if (string.IsNullOrWhiteSpace(src) || string.IsNullOrWhiteSpace(dest))
+            {
+                return BadRequest("Source or destination missing.");
+            }
+
+            try
+            {
+                _diskRepository.Move(src, dest);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message);
+            }
+        }
+
+        private static void CopyDirectory(string sourceDir, string destDir)
+        {
+            var dir = new DirectoryInfo(sourceDir);
+            if (!dir.Exists)
+                throw new DirectoryNotFoundException($"Source directory not found: {sourceDir}");
+
+            Directory.CreateDirectory(destDir);
+
+            foreach (var file in dir.GetFiles())
+            {
+                string targetFilePath = Path.Combine(destDir, file.Name);
+                file.CopyTo(targetFilePath, overwrite: false);
+            }
+
+            foreach (var subDir in dir.GetDirectories())
+            {
+                string newDestDir = Path.Combine(destDir, subDir.Name);
+                CopyDirectory(subDir.FullName, newDestDir);
+            }
+        }
+
 
         public DiskController(IMaestro maestro, IDiskRepository diskRepository)
         {
